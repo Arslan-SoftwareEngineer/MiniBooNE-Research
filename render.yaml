@@ -1,0 +1,15 @@
+# OPTIONAL: hosts the Flask API so the public GitHub Pages site can score readings.
+# Render redeploys automatically on every push to main (continuous deployment).
+services:
+  - type: web
+    name: miniboone-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt gunicorn
+    startCommand: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 60
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: CORS_ORIGINS
+        value: https://YOUR_GITHUB_USERNAME.github.io

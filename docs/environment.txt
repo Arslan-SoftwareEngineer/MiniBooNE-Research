@@ -1,0 +1,9 @@
+Fill this in (manual stage 2.7). In a terminal run:
+
+    git --version
+    node --version
+    npm --version
+    py -3.12 --version
+    python -m pip freeze | findstr /i "xgboost scikit-learn flask numpy pandas"
+
+and paste the output below.

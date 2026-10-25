@@ -1,0 +1,28 @@
+# Python and local environments
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+.env.*
+!.env.example
+
+# Angular dependencies and build outputs
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Large raw data (only the small sample CSV is committed)
+data/openml_cache/
+data/MiniBooNE_PID.txt
+data/miniboone*.csv
+
+# Logs
+*.log
+
+# NOTE: backend/models/model_bundle.joblib IS committed on purpose:
+# the hosted API (optional Render deploy) loads it at start-up.
