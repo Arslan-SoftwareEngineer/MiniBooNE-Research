@@ -1,0 +1,31 @@
+<header class="top">
+  <div class="brand">
+    <h1>Neutrino classifier under sensor failure</h1>
+    <p>MiniBooNE particle identification · does the model keep its answer when sensors die?</p>
+  </div>
+  <span class="status" [class]="'status ' + status().cls">{{ status().text }}</span>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  @for (t of tabs; track t.id) {
+    <button type="button" role="tab" [attr.aria-selected]="tab() === t.id" [class.on]="tab() === t.id" (click)="tab.set(t.id)">{{ t.label }}</button>
+  }
+</nav>
+
+<main>
+  @if (data.loadError()) { <p class="note warn" role="alert">{{ data.loadError() }}</p> }
+  @switch (tab()) {
+    @case ('predict') { <app-predict /> }
+    @case ('study') { <app-research /> }
+    @case ('about') {
+      <section class="panel prose">
+        <h2>What this is</h2>
+        <p>A classifier separates electron-neutrino events (signal) from muon-neutrino events (background) using 50 detector measurements. In a real deployment some of those measurements can disappear. This app lets you switch sensors off and compare a normally trained XGBoost model with one trained on a mix of clean and sensor-dropout data.</p>
+        <h2>What runs where</h2>
+        <p>The models run in a Flask API on a machine you control. This Angular page only collects the 50 values and shows the answers. On a public static host such as GitHub Pages there is no Python, so the page falls back to the saved study results unless an API address has been configured at deploy time.</p>
+        <h2>Limits</h2>
+        <p>This is a coursework prototype. The study covers zeroed sensors and Gaussian noise on tabular accuracy; it is not a validated physics analysis, and a result on one dataset does not show the same gain elsewhere.</p>
+      </section>
+    }
+  }
+</main>

@@ -1,0 +1,53 @@
+name: Deploy Angular to GitHub Pages
+
+# Continuous deployment: runs only after "Full-stack CI" has PASSED on main.
+on:
+  workflow_run:
+    workflows: ["Full-stack CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      # Optional: set a repository VARIABLE named API_URL (Settings > Secrets and variables > Actions > Variables)
+      # to the HTTPS address of a hosted Flask API. Leave it unset for a static, results-only site.
+      - name: Write runtime config
+        run: |
+          printf '{ "apiBase": "%s" }\n' "${API_URL}" > frontend/public/config.json
+          cat frontend/public/config.json
+        env:
+          API_URL: ${{ vars.API_URL }}
+      - run: npx ng build --configuration production --base-href "/${{ github.event.repository.name }}/"
+        working-directory: frontend
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist/frontend/browser
+      - id: deployment
+        uses: actions/deploy-pages@v4
